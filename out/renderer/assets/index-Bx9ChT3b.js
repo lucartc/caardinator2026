@@ -12449,47 +12449,222 @@ function requireClient() {
   return client.exports;
 }
 var clientExports = requireClient();
-function Versions() {
-  const [versions] = reactExports.useState(window.electron.process.versions);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "versions", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "electron-version", children: [
-      "Electron v",
-      versions.electron
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "chrome-version", children: [
-      "Chromium v",
-      versions.chrome
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "node-version", children: [
-      "Node v",
-      versions.node
-    ] })
+class LocalStorageState {
+  _projects;
+  _lists;
+  _cards;
+  constructor() {
+    this._projects = this.getFromLocalStorage("projects");
+    this._lists = this.getFromLocalStorage("lists");
+    this._cards = this.getFromLocalStorage("cards");
+  }
+  createProject = (data) => {
+    const new_project = {
+      id: this.getNextProjectId(),
+      title: data.title,
+      lists: []
+    };
+    this._projects.push(new_project);
+  };
+  createList = (data) => {
+    const new_list = {
+      id: this.getNextListId(),
+      title: data.title,
+      cards: []
+    };
+    this._lists.push(new_list);
+  };
+  createCard = (data) => {
+    const new_card = {
+      id: this.getNextCardId(),
+      title: data.title,
+      cards: []
+    };
+    this._lists.push(new_card);
+  };
+  getProjects = (data) => {
+    const projects = this.getFromLocalStorage("projects");
+    const results = projects.filter((proj) => data.ids.includes(proj.id));
+    return results;
+  };
+  getLists = (data) => {
+    const lists = this.getFromLocalStorage("lists");
+    const results = lists.filter((list) => data.ids.includes(list.id));
+    return results;
+  };
+  getCards = (data) => {
+    const cards = this.getFromLocalStorage("cards");
+    const results = cards.filter((card) => data.ids.includes(card.id));
+    return results;
+  };
+  updateProject = (data) => {
+    const project = this.getProjects({ ids: [data.id] })[0];
+    project.lists = data.lists ? data.lists : project.lists;
+    project.title = data.title ? data.title : project.title;
+    this._projects = this._projects.filter((proj) => proj.id != project.id);
+    this._projects.push(project);
+    this.setInLocalStorage("projects", JSON.stringify(this._projects));
+  };
+  updateList = (data) => {
+    const list = this.getLists({ ids: [data.id] })[0];
+    list.cards = data.cards ? data.cards : list.cards;
+    list.title = data.title ? data.title : list.title;
+    this._lists = this._lists.filter((li) => li.id != list.id);
+    this._lists.push(list);
+    this.setInLocalStorage("lists", JSON.stringify(this._lists));
+  };
+  updateCard = (data) => {
+    const card = this.getCards({ ids: [data.id] })[0];
+    card.description = data.description ? data.description : card.description;
+    card.title = data.title ? data.title : card.title;
+    this._cards = this._cards.filter((c) => c.id != card.id);
+    this._cards.push(card);
+    this.setInLocalStorage("cards", JSON.stringify(this._cards));
+  };
+  deleteProjects = (data) => {
+    const project = this.getProjects({ ids: [data.id] })[0];
+    this._projects = this._projects.filter((proj) => proj.id != project.id);
+    this.setInLocalStorage("projects", JSON.stringify(this._projects));
+  };
+  deleteLists = (data) => {
+    const list = this.getLists({ ids: [data.id] })[0];
+    this._lists = this._lists.filter((li) => li.id != list.id);
+    this.setInLocalStorage("lists", JSON.stringify(this._lists));
+  };
+  deleteCards = (data) => {
+    const card = this.getCards({ ids: [data.id] })[0];
+    this._cards = this._cards.filter((c) => c.id != card.id);
+    this.setInLocalStorage("cards", JSON.stringify(this._cards));
+  };
+  moveCard = (data) => {
+    const card = this.getCards({ ids: [data.id] })[0];
+    const list = this.getLists({ ids: [data.to] })[0];
+    let old_list_id = null;
+    this._lists.forEach((li) => {
+      if (li.id != list.id) {
+        const card_ids = li.cards.map((card2) => card2.id);
+        if (card_ids.includes(card.id)) {
+          old_list_id = li.id;
+        }
+      }
+    });
+    if (old_list_id != null) {
+      const old_list = this.getLists({ ids: [old_list_id] })[0];
+      old_list.cards = old_list.cards.filter((c) => c.id != card.id);
+      this.updateList({ id: old_list_id, cards: old_list.cards });
+    }
+    list.cards.push(card);
+    this.updateList({ id: data.to, cards: list.cards.map((c) => c) });
+  };
+  moveList = (data) => {
+    const list = this.getLists({ ids: [data.id] })[0];
+    const project = this.getProjects({ ids: [data.project] })[0];
+    project.lists = project.lists.filter((li) => li.id != list.id);
+    const start = project.lists.splice(0, data.position);
+    const end = project.lists.splice(data.position);
+    project.lists = [start, list, end].flat();
+    this.updateProject({ id: project.id, lists: project.lists });
+  };
+  getFromLocalStorage(key) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : data;
+  }
+  setInLocalStorage(key, data) {
+    localStorage.setItem(key, data);
+  }
+  getNextProjectId() {
+    const sorted_projects = this._projects.sort((a, b) => b.id - a.id);
+    return sorted_projects[0].id ? sorted_projects[0].id : 0;
+  }
+  getNextListId() {
+    const sorted_list = this._lists.sort((a, b) => b.id - a.id);
+    return sorted_list[0].id ? sorted_list[0].id : 0;
+  }
+  getNextCardId() {
+    const sorted_card = this._cards.sort((a, b) => b.id - a.id);
+    return sorted_card[0].id ? sorted_card[0].id : 0;
+  }
+}
+class HomePageSignal {
+  _state = new LocalStorageState();
+  _app;
+  constructor(app) {
+    this._app = app;
+  }
+  signal(signal) {
+    switch (signal) {
+      case "goToWorkspace":
+        this._app.navigate("WorkspaceComponent");
+        break;
+    }
+  }
+}
+class WorkspaceSignal {
+  _state = new LocalStorageState();
+  _app;
+  constructor(app) {
+    this._app = app;
+  }
+  signal(signal) {
+    switch (signal) {
+      case "goToHome":
+        this._app.navigate("HomePageComponent");
+        break;
+    }
+  }
+}
+class SignalFactory {
+  static signalMap = {
+    "HomePageSignal": HomePageSignal,
+    "WorkspaceSignal": WorkspaceSignal
+  };
+  static createSignal(signalName, app) {
+    const SignalClass = SignalFactory.signalMap[signalName];
+    if (SignalClass) {
+      return new SignalClass(app);
+    }
+  }
+}
+function AppComponent(props) {
+  const [currentRouteIndex, setCurrentRouteIndex] = reactExports.useState(0);
+  const [Component, signal] = props.routes[currentRouteIndex];
+  const AppApi = {
+    navigate: function(page) {
+      const routeNames = props.routes.map((r) => r[0].name);
+      const newRouteIndex = routeNames.indexOf(page);
+      if (newRouteIndex >= 0) {
+        setCurrentRouteIndex(newRouteIndex);
+      }
+    }
+  };
+  const showRoutePage = () => {
+    const signalObject = SignalFactory.createSignal(signal.name, AppApi);
+    if (signalObject) {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Component, { signal: signalObject });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {});
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: showRoutePage() });
+}
+function HomePageComponent(_props) {
+  const goToWorkspace = () => _props.signal.signal("goToWorkspace");
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Home" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: goToWorkspace, children: "Go to Workspace" })
   ] });
 }
-const electronLogo = "" + new URL("electron-DtwWEc_u.svg", import.meta.url).href;
-function App() {
-  const ipcHandle = () => window.electron.ipcRenderer.send("ping");
+function WorkspaceComponent(_props) {
+  const goToHome = () => {
+    _props.signal.signal("goToHome");
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("img", { alt: "logo", className: "logo", src: electronLogo }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "creator", children: "Powered by electron-vite" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text", children: [
-      "Build an Electron app with ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "react", children: "React" }),
-      " and ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ts", children: "TypeScript" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "tip", children: [
-      "Please try pressing ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("code", { children: "F12" }),
-      " to open the devTool"
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "actions", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "action", children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://electron-vite.org/", target: "_blank", rel: "noreferrer", children: "Documentation" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "action", children: /* @__PURE__ */ jsxRuntimeExports.jsx("a", { target: "_blank", rel: "noreferrer", onClick: ipcHandle, children: "Send IPC" }) })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Versions, {})
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Workspace" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: goToHome, children: "Go to Home" })
   ] });
 }
 clientExports.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
+  /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(AppComponent, { routes: [
+    [HomePageComponent, HomePageSignal],
+    [WorkspaceComponent, WorkspaceSignal]
+  ] }) })
 );
