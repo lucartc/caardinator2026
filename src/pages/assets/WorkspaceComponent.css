@@ -1,0 +1,57 @@
+/* Estilos específicos para WorkspaceComponent */
+.workspace-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  backdrop-filter: blur(10px);
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.kanban-board {
+  background: linear-gradient(135deg, #0f172a 0%, #0a0e1a 100%);
+}
+
+.column-container {
+  scroll-behavior: smooth;
+}
+
+.floating-action-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-action-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px -5px rgba(139, 92, 246, 0.6);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kanban-column {
+  animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.kanban-column:nth-child(1) { animation-delay: 0.1s; }
+.kanban-column:nth-child(2) { animation-delay: 0.2s; }
+.kanban-column:nth-child(3) { animation-delay: 0.3s; }
+.kanban-column:nth-child(4) { animation-delay: 0.4s; }
+
+.stats-indicator {
+  transition: all 0.2s ease;
+}
+
+.stats-indicator:hover {
+  transform: scale(1.1);
+}

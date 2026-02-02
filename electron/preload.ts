@@ -1,3 +1,12 @@
+// import { createRequire } from 'node:module'
+
+// const require = createRequire(import.meta.url)
+
+// // Carregar wdio-electron-service apenas em modo de teste
+// if (process.env.TEST === 'true') {
+//   require('wdio-electron-service/preload')
+// }
+
 import { ipcRenderer, contextBridge } from 'electron'
 
 // --------- Expose some API to the Renderer process ---------

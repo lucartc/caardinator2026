@@ -1,3 +1,12 @@
+// import { createRequire } from 'node:module'
+
+// const require = createRequire(import.meta.url)
+
+// // Carregar wdio-electron-service apenas em modo de teste
+// if (process.env.TEST === 'true') {
+//   require('wdio-electron-service/main')
+// }
+
 import { app, BrowserWindow } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -29,6 +38,7 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      nodeIntegration: true
     },
   })
 
