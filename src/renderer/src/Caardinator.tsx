@@ -40,7 +40,7 @@ import { App } from '../../interfaces/entities'
 import { useState } from 'react'
 import SignalFactory from '../../signals/SignalFactory'
 
-function AppComponent(props : AppProps) {
+function Caardinator(props : AppProps) {
   const [currentRouteIndex,setCurrentRouteIndex] = useState(0)
   const [Component, signal, api] = props.routes[currentRouteIndex]
 
@@ -72,4 +72,4 @@ function AppComponent(props : AppProps) {
   )
 }
 
-export default AppComponent
+export default Caardinator
