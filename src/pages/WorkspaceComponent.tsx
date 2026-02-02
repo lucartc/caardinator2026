@@ -1,4 +1,4 @@
-import { PageProps } from '../interfaces/props'
+import { PageProps } from '../interfaces/utils'
 
 function WorkspaceComponent(_props: PageProps) {
 

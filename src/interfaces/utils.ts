@@ -1,4 +1,5 @@
 import {
+  Api,
     Signal
 } from './entities'
 
@@ -25,7 +26,7 @@ type ClassName = new (...args: any[]) => any
 // é a componente React da Página,
 // e o segundo é a classe do Signal
 // dessa mesma página.
-type RouteMap = [React.FC<PageProps>,ClassName][]
+type RouteMap = [React.FC<PageProps>,ClassName,Api][]
 
 export type {
     PageProps,

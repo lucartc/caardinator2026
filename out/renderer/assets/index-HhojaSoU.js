@@ -12449,7 +12449,86 @@ function requireClient() {
   return client.exports;
 }
 var clientExports = requireClient();
-class LocalStorageState {
+class HomePageSignal {
+  api;
+  app;
+  constructor(app, api) {
+    this.app = app;
+    this.api = api;
+  }
+  signal(signal) {
+    switch (signal) {
+      case "goToWorkspace":
+        this.app.navigate("WorkspaceComponent");
+        break;
+    }
+  }
+}
+class WorkspaceSignal {
+  api;
+  app;
+  constructor(app, api) {
+    this.app = app;
+    this.api = api;
+  }
+  signal(signal) {
+    switch (signal) {
+      case "goToHome":
+        this.app.navigate("HomePageComponent");
+        break;
+    }
+  }
+}
+class SignalFactory {
+  static signalMap = {
+    "HomePageSignal": HomePageSignal,
+    "WorkspaceSignal": WorkspaceSignal
+  };
+  static createSignal(signalName, app, api) {
+    const SignalClass = SignalFactory.signalMap[signalName];
+    if (SignalClass) {
+      return new SignalClass(app, api);
+    }
+  }
+}
+function AppComponent(props) {
+  const [currentRouteIndex, setCurrentRouteIndex] = reactExports.useState(0);
+  const [Component, signal, api] = props.routes[currentRouteIndex];
+  const AppApi = {
+    navigate: function(page) {
+      const routeNames = props.routes.map((r) => r[0].name);
+      const newRouteIndex = routeNames.indexOf(page);
+      if (newRouteIndex >= 0) {
+        setCurrentRouteIndex(newRouteIndex);
+      }
+    }
+  };
+  const showRoutePage = () => {
+    const signalObject = SignalFactory.createSignal(signal.name, AppApi, api);
+    if (signalObject) {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Component, { signal: signalObject });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {});
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: showRoutePage() });
+}
+function HomePageComponent(_props) {
+  const goToWorkspace = () => _props.signal.signal("goToWorkspace");
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Home" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: goToWorkspace, children: "Go to Workspace" })
+  ] });
+}
+function WorkspaceComponent(_props) {
+  const goToHome = () => {
+    _props.signal.signal("goToHome");
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Workspace" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: goToHome, children: "Go to Home" })
+  ] });
+}
+class LocalStorageApi {
   _projects;
   _lists;
   _cards;
@@ -12585,86 +12664,9 @@ class LocalStorageState {
     return sorted_card[0].id ? sorted_card[0].id : 0;
   }
 }
-class HomePageSignal {
-  _state = new LocalStorageState();
-  _app;
-  constructor(app) {
-    this._app = app;
-  }
-  signal(signal) {
-    switch (signal) {
-      case "goToWorkspace":
-        this._app.navigate("WorkspaceComponent");
-        break;
-    }
-  }
-}
-class WorkspaceSignal {
-  _state = new LocalStorageState();
-  _app;
-  constructor(app) {
-    this._app = app;
-  }
-  signal(signal) {
-    switch (signal) {
-      case "goToHome":
-        this._app.navigate("HomePageComponent");
-        break;
-    }
-  }
-}
-class SignalFactory {
-  static signalMap = {
-    "HomePageSignal": HomePageSignal,
-    "WorkspaceSignal": WorkspaceSignal
-  };
-  static createSignal(signalName, app) {
-    const SignalClass = SignalFactory.signalMap[signalName];
-    if (SignalClass) {
-      return new SignalClass(app);
-    }
-  }
-}
-function AppComponent(props) {
-  const [currentRouteIndex, setCurrentRouteIndex] = reactExports.useState(0);
-  const [Component, signal] = props.routes[currentRouteIndex];
-  const AppApi = {
-    navigate: function(page) {
-      const routeNames = props.routes.map((r) => r[0].name);
-      const newRouteIndex = routeNames.indexOf(page);
-      if (newRouteIndex >= 0) {
-        setCurrentRouteIndex(newRouteIndex);
-      }
-    }
-  };
-  const showRoutePage = () => {
-    const signalObject = SignalFactory.createSignal(signal.name, AppApi);
-    if (signalObject) {
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(Component, { signal: signalObject });
-    }
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {});
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: showRoutePage() });
-}
-function HomePageComponent(_props) {
-  const goToWorkspace = () => _props.signal.signal("goToWorkspace");
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Home" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: goToWorkspace, children: "Go to Workspace" })
-  ] });
-}
-function WorkspaceComponent(_props) {
-  const goToHome = () => {
-    _props.signal.signal("goToHome");
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Workspace" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: goToHome, children: "Go to Home" })
-  ] });
-}
 clientExports.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ jsxRuntimeExports.jsx(reactExports.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(AppComponent, { routes: [
-    [HomePageComponent, HomePageSignal],
-    [WorkspaceComponent, WorkspaceSignal]
+    [HomePageComponent, HomePageSignal, new LocalStorageApi()],
+    [WorkspaceComponent, WorkspaceSignal, new LocalStorageApi()]
   ] }) })
 );

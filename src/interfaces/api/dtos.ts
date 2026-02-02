@@ -1,7 +1,7 @@
 import {
     List,
     Card
-} from './entities'
+} from '../entities'
 
 // API DTOs
 

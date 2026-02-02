@@ -1,19 +1,19 @@
-import { App, Signal, State } from '../interfaces/entities'
-import LocalStorageState from '../state_adapters/localstorage'
+import { App, Signal, Api } from '../interfaces/entities'
 
 class HomePageSignal implements Signal{
-    _state : State = new LocalStorageState()
-    _app : App
+    api : Api
+    app : App
 
-    constructor(app: App){
-        this._app = app
+    constructor(app: App, api: Api){
+        this.app = app
+        this.api = api
     }
 
     public signal(signal: string){
         // Implementa signal
         switch(signal){
             case 'goToWorkspace':
-                this._app.navigate('WorkspaceComponent')
+                this.app.navigate('WorkspaceComponent')
                 break;
         }
     }

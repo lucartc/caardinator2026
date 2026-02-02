@@ -35,14 +35,14 @@
 // export default App
 
 //////////////////////
-import { AppProps } from '../../interfaces/props'
+import { AppProps } from '../../interfaces/utils'
 import { App } from '../../interfaces/entities'
 import { useState } from 'react'
 import SignalFactory from '../../signals/SignalFactory'
 
 function AppComponent(props : AppProps) {
   const [currentRouteIndex,setCurrentRouteIndex] = useState(0)
-  const [Component, signal] = props.routes[currentRouteIndex]
+  const [Component, signal, api] = props.routes[currentRouteIndex]
 
   const AppApi : App = {
     navigate: function (page: string): void {
@@ -56,7 +56,7 @@ function AppComponent(props : AppProps) {
   }
 
   const showRoutePage = () => {
-    const signalObject = SignalFactory.createSignal(signal.name,AppApi)
+    const signalObject = SignalFactory.createSignal(signal.name,AppApi,api)
 
     if(signalObject){
       return <Component signal={signalObject}></Component>

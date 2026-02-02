@@ -8,7 +8,8 @@
     "src/interfaces",
     "src/pages",
     "src/signals",
-    "src/state_adapters"
+    "src/storage",
+    "src/api"
   ],
   "compilerOptions": {
     "composite": true,

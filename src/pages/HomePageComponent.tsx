@@ -1,4 +1,4 @@
-import { PageProps } from '../interfaces/props'
+import { PageProps } from '../interfaces/utils'
 import './assets/HomePageComponent.css'
 
 function HomePageComponent(_props: PageProps) {

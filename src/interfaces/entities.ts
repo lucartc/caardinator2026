@@ -15,18 +15,19 @@ import {
   DeleteCardsFunction,
   MoveCardFunction,
   MoveListFunction
-
-} from './api'
+} from './api/routes'
 
 interface Signal{
   signal: SignalFunction
+  app: App
+  api: Api
 }
 
 interface App{
   navigate: NavigateFunction
 }
 
-interface State{
+interface Api{
   createProject: CreateProjectFunction
   createList: CreateListFunction
   createCard: CreateCardFunction
@@ -64,7 +65,7 @@ interface Project{
 export type{
   Signal,
   App,
-  State,
+  Api,
   List,
   Card,
   Project

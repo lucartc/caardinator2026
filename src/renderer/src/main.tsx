@@ -7,13 +7,14 @@ import HomePageComponent from '../../pages/HomePageComponent'
 import WorkspaceComponent from '../../pages/WorkspaceComponent'
 import HomePageSignal from '../../signals/HomePageSignal'
 import WorkspaceSignal from '../../signals/WorkspaceSignal'
+import LocalStorageApi from '../../api/localstorageapi'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppComponent routes={
       [
-        [HomePageComponent,HomePageSignal],
-        [WorkspaceComponent,WorkspaceSignal],
+        [HomePageComponent,HomePageSignal,new LocalStorageApi()],
+        [WorkspaceComponent,WorkspaceSignal,new LocalStorageApi()],
       ]
     }/>
   </StrictMode>,

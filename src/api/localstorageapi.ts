@@ -1,4 +1,4 @@
-import { Card, List, Project, State } from "../interfaces/entities";
+import { Card, List, Project, Api } from "../interfaces/entities";
 import {
     CreateProjectFunction,
     CreateListFunction,
@@ -14,9 +14,9 @@ import {
     DeleteCardsFunction,
     MoveCardFunction,
     MoveListFunction
-} from "../interfaces/api";
+} from "../interfaces/api/routes";
 
-class LocalStorageState implements State{
+class LocalStorageApi implements Api{
     _projects : Project[]
     _lists: List[]
     _cards: Card[]
@@ -122,7 +122,7 @@ class LocalStorageState implements State{
     public moveCard: MoveCardFunction = (data) => {
         const card : Card = this.getCards({ids: [data.id]})[0]
         const list : List = this.getLists({ids: [data.to]})[0]
-        let old_list_id = null
+        let old_list_id : number| null = null
 
         this._lists.forEach(li => {
             if(li.id != list.id){
@@ -180,4 +180,4 @@ class LocalStorageState implements State{
     }
 }
 
-export default LocalStorageState
+export default LocalStorageApi

@@ -19,7 +19,7 @@ import{
     Project,
     List,
     Card
-} from './entities'
+} from '../entities'
 
 // API Services
 
